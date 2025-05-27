@@ -186,7 +186,7 @@ timeline_df['House_Color'] = timeline_df['House_Allegiance'].map(DUNE_HOUSE_COLO
 fig = px.bar(
     timeline_df,
     y='Character',
-    x='Lifespan',
+    x='Years AG (after Space Guild)',
     base='Born',
     color='House_Allegiance',
     orientation='h',
