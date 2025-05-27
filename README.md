@@ -37,6 +37,8 @@ The Dune Character Explorer app is a hands-on exercise to:
 git clone https://github.com/yourusername/dune-character-explorer.git
 cd dune-character-explorer
 
+```
+
 ## 🙏 Credits & Acknowledgements
 
 - Constructor Academy, for the Data Science Bootcamp and learning support.
