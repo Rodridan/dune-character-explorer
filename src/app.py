@@ -23,11 +23,11 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-data_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'dune_banner.png')
+image_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'dune_banner.png')
 
 st.title("🪐 Dune Character Explorer")
 st.markdown("> Visualize the universe of Frank Herbert’s Dune — characters, houses, relationships, and more.")
-st.image(data_path ,  use_container_width=True)
+st.image(image_path ,  use_container_width=True)
 
 
 print("Streamlit script started:", time.time())
@@ -37,6 +37,9 @@ print("Streamlit script started:", time.time())
 def load_data():
     print("Loading data...")
     data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'duneCharacters_kaggle.csv')
+    if not os.path.exists(data_path):
+        st.warning("Please download `duneCharacters_kaggle.csv` from Kaggle and place it in the `data/` folder.")
+        st.stop()
     df = pd.read_csv(data_path, encoding="latin1")
     return df
 df = load_data()

@@ -4,4 +4,3 @@ __pycache__/
 venv/
 .env
 data/
-!data/duneCharacters_haggle.csv

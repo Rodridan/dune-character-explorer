@@ -36,8 +36,10 @@ The Dune Character Explorer app is a hands-on exercise to:
 ```bash
 git clone https://github.com/yourusername/dune-character-explorer.git
 cd dune-character-explorer
-
 ```
+- Download duneCharacters_kaggle.csv from Kaggle Dune Characters Dataset
+- Place it in the data/ folder.
+
 
 ## 🙏 Credits & Acknowledgements
 
