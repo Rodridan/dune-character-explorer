@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import os
+import time
+print("Streamlit script started:", time.time())
+
 
 st.set_page_config(page_title="Dune Character Explorer", layout="wide")
 st.title("🪐 Dune Character Explorer")
@@ -14,6 +17,7 @@ st.write(
 # --- Data Loading ---
 @st.cache_data
 def load_data():
+    print("Loading data...")
     data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'duneCharacters_kaggle.csv')
     df = pd.read_csv(data_path)
     return df
