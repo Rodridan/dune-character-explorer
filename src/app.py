@@ -15,14 +15,24 @@ st.write(
 )
 
 # --- Data Loading ---
+# @st.cache_data
+# def load_data():
+#     print("Loading data...")
+#     data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'duneCharacters_kaggle.csv')
+#     df = pd.read_csv(data_path)
+#     return df
+
+# df = load_data()
+
 @st.cache_data
 def load_data():
-    print("Loading data...")
     data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'duneCharacters_kaggle.csv')
+    st.write(f"Trying to load: {data_path}")
+    assert os.path.exists(data_path), f"File not found: {data_path}"
     df = pd.read_csv(data_path)
+    st.write("File loaded!")
     return df
 
-df = load_data()
 
 # --- Summary Stats ---
 col1, col2, col3, col4 = st.columns(4)
