@@ -1,8 +1,12 @@
 import streamlit as st
 import pandas as pd
+import re
+import numpy as np
 import plotly.express as px
 import os
 import time
+import networkx as nx
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="Dune Character Explorer", layout="wide")
 
@@ -45,6 +49,49 @@ def load_data():
     df = pd.read_csv(data_path, encoding="latin1")
     return df
 df = load_data()
+
+# Clean corrupt characters in 'Detail' (right after loading df)
+df['Detail'] = df['Detail'].str.replace(r'[ÿ\r\n\t]+', ' ', regex=True)
+df['Detail'] = df['Detail'].str.replace(r'\s+', ' ', regex=True).str.strip()
+
+
+def extract_years(detail):
+    """
+    Extracts born and died years from a detail string like:
+    "(10148 AG - 10191 AG)", "(-10176 AG)", "(10191 AG)"
+    Returns (born, died) as floats or np.nan if not found.
+    """
+    if pd.isnull(detail):
+        return np.nan, np.nan
+
+    # Pattern: (Born AG - Died AG)
+    match = re.search(r"\((\-?\d+)\s*AG\s*-\s*(\-?\d+)\s*AG\)", detail)
+    if match:
+        born, died = match.groups()
+        return float(born), float(died)
+    
+    # Pattern: (Born AG) -- single positive year means Born
+    match = re.search(r"\((\d+)\s*AG\)", detail)
+    if match:
+        born = float(match.group(1))
+        return born, np.nan
+    
+    # Pattern: (-Died AG) -- negative means Died only
+    match = re.search(r"\(\-(\d+)\s*AG\)", detail)
+    if match:
+        died = float(match.group(1))
+        return np.nan, died
+
+    return np.nan, np.nan
+
+# Fill Born/Died in df where missing using extract_years()
+for idx, row in df.iterrows():
+    if pd.isnull(row['Born']) or pd.isnull(row['Died']):
+        born, died = extract_years(row['Detail'])
+        if pd.isnull(row['Born']) and not np.isnan(born):
+            df.at[idx, 'Born'] = born
+        if pd.isnull(row['Died']) and not np.isnan(died):
+            df.at[idx, 'Died'] = died
 
 # --- Summary Stats ---
 col1, col2, col3, col4 = st.columns(4)
@@ -109,13 +156,17 @@ st.plotly_chart(fig, use_container_width=True)
 st.markdown("## 📅 Character Lifespan Timeline")
 
 timeline_df = df.copy()
-timeline_df = timeline_df[pd.to_numeric(timeline_df['Born'], errors='coerce').notnull()]
 timeline_df['Born'] = pd.to_numeric(timeline_df['Born'], errors='coerce')
 timeline_df['Died'] = pd.to_numeric(timeline_df['Died'], errors='coerce')
-timeline_df['Died'] = timeline_df['Died'].fillna(timeline_df['Born'] + 1)
+
+# If only Died is known, set Born = Died - 1; if only Born is known, set Died = Born + 1
+timeline_df.loc[timeline_df['Born'].isna() & timeline_df['Died'].notna(), 'Born'] = timeline_df['Died'] - 1
+timeline_df.loc[timeline_df['Died'].isna() & timeline_df['Born'].notna(), 'Died'] = timeline_df['Born'] + 1
+
+# Now compute Lifespan
 timeline_df['Lifespan'] = timeline_df['Died'] - timeline_df['Born']
-timeline_df = timeline_df.sort_values('Born')
 timeline_df = timeline_df.drop_duplicates(subset=['Character'])
+timeline_df = timeline_df.sort_values('Born')
 
 DUNE_HOUSE_COLORS = {
     'Atreides': '#145A32',
@@ -130,7 +181,6 @@ DUNE_HOUSE_COLORS = {
     'Camatra': '#2874A6',
     'Unknown': '#CCCCCC'
 }
-
 timeline_df['House_Color'] = timeline_df['House_Allegiance'].map(DUNE_HOUSE_COLORS).fillna('#CCCCCC')
 
 fig = px.bar(
@@ -144,6 +194,7 @@ fig = px.bar(
     title="Dune Character Lifespans",
     custom_data=['Born', 'Died', 'Lifespan', 'House_Allegiance', 'Book']
 )
+
 fig.update_traces(
     hovertemplate=(
         "Character: %{y}<br>"
@@ -154,12 +205,21 @@ fig.update_traces(
         "Book: %{customdata[4]}<extra></extra>"
     )
 )
-fig.update_layout(
-    yaxis=dict(autorange='reversed'),
-    xaxis_title="Year"
-)
+events_df = pd.read_csv(os.path.join('data', 'dune_timeline_events.csv'))
+
+for _, row in events_df.iterrows():
+    fig.add_vline(
+        x=row["Year"],
+        line_width=2,
+        line_dash="dot",
+        line_color="red",
+        annotation_text=row["Event"],
+        annotation_position="top right",
+        opacity=0.7
+    )
 
 st.plotly_chart(fig, use_container_width=True)
+
 
 # --- Character Detail Viewer ---
 st.subheader("Character Explorer")
@@ -197,8 +257,6 @@ with st.expander(f"Details for {selected_char}", expanded=True):
 
 
 # --- Relationships ---
-import networkx as nx
-import plotly.graph_objects as go
 
 st.markdown("## Character Relationship Network")
 
@@ -259,20 +317,45 @@ for node in G.nodes():
 
 pos = nx.spring_layout(G, k=0.7, iterations=50, seed=42)
 
-edge_x = []
-edge_y = []
-for source, target in G.edges():
-    x0, y0 = pos[source]
-    x1, y1 = pos[target]
-    edge_x += [x0, x1, None]
-    edge_y += [y0, y1, None]
+# Relationship type colors
+RELATIONSHIP_COLORS = {
+    'parent': '#a0522d',
+    'child': '#f39c12',
+    'spouse': '#2980b9',
+    'ally': '#27ae60',
+    'enemy': '#e74c3c',
+    'mentor': '#8e44ad',
+    'concubine': '#d35400',
+    'other': '#95a5a6'
+}
+unique_rels = [r for r in rel_df['relationship_type'].unique() if pd.notnull(r)]
+import itertools
+palette = px.colors.qualitative.Plotly + px.colors.qualitative.Pastel
+for rel, col in zip(unique_rels, itertools.cycle(palette)):
+    if rel not in RELATIONSHIP_COLORS:
+        RELATIONSHIP_COLORS[rel] = col
 
-edge_trace = go.Scatter(
-    x=edge_x, y=edge_y,
-    line=dict(width=1, color='#888'),
-    hoverinfo='none',
-    mode='lines'
-)
+# Build edge traces for each relationship type
+edge_traces = []
+for rel_type in unique_rels:
+    edge_x = []
+    edge_y = []
+    for source, target, attr in G.edges(data=True):
+        if attr.get('relationship_type') == rel_type:
+            x0, y0 = pos[source]
+            x1, y1 = pos[target]
+            edge_x += [x0, x1, None]
+            edge_y += [y0, y1, None]
+    edge_traces.append(
+        go.Scatter(
+            x=edge_x, y=edge_y,
+            line=dict(width=2, color=RELATIONSHIP_COLORS.get(rel_type, '#888')),
+            hoverinfo='none',
+            mode='lines',
+            showlegend=True,
+            name=f"Rel: {rel_type.capitalize()}"
+        )
+    )
 
 node_x = []
 node_y = []
@@ -305,10 +388,9 @@ node_trace = go.Scatter(
 )
 
 
-fig_network = go.Figure(data=[edge_trace, node_trace],
+fig_network = go.Figure(data=edge_traces + [node_trace],
             layout=go.Layout(
                 title='Dune Character Relationship Network',
-                showlegend=False,
                 hovermode='closest',
                 margin=dict(b=20, l=5, r=5, t=40),
                 xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
@@ -325,10 +407,9 @@ for house, color in DUNE_HOUSE_COLORS.items():
             marker=dict(size=12, color=color),
             legendgroup=house,
             showlegend=True,
-            name=house
+            name=f"House: {house}"
         )
     )
-
 fig_network.add_traces(legend_traces)
 fig_network.update_layout(showlegend=True)
 
