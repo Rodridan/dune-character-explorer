@@ -33,6 +33,8 @@ st.image(image_path ,  use_container_width=True)
 print("Streamlit script started:", time.time())
 
 # --- Data Loading ---
+
+
 @st.cache_data
 def load_data():
     print("Loading data...")
