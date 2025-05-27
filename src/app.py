@@ -62,28 +62,7 @@ fig = px.bar(
 fig.update_layout(showlegend=False, xaxis={'categoryorder':'total descending'})
 st.plotly_chart(fig, use_container_width=True)
 
-# --- Bar Chart: Characters per Culture ---
-culture_counts = (
-    filtered_df['Culture']
-    .fillna('Unknown')
-    .value_counts()
-    .head(10)
-    .reset_index()
-    .rename(columns={'index': 'Culture', 'Culture': 'Count'})
-)
-
-fig_culture = px.bar(
-    culture_counts,
-    x='Culture', y='Count',
-    title="Top 10 Cultures by Number of Characters",
-    labels={'Culture': 'Culture', 'Count': 'Number of Characters'},
-    color='Culture'
-)
-fig_culture.update_layout(showlegend=False, xaxis={'categoryorder':'total descending'})
-st.plotly_chart(fig_culture, use_container_width=True)
-
-st.markdown("---")
-
+#
 # # --- Character Detail Viewer ---
 # st.subheader("Character Explorer")
 # # Optional: allow user to filter by House/Culture as well
