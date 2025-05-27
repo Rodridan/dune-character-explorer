@@ -17,15 +17,15 @@ The Dune Character Explorer app is a hands-on exercise to:
 ---
 
 
+
 ## ✨ Features
 
-- **Bar chart of characters per House** (Plotly, interactive)
-- **Filter by book, house, culture, or species**
-- **Detailed character view** (name, allegiance, culture, lifespan, description)
-- **Responsive UI:** Works on desktop and mobile
-- **[Coming soon] Relationship network** (visualize alliances, families, enemies)
-- **[Coming soon] Interactive timeline** (plot events, births/deaths)
-- **Modular code structure** for easy expansion
+- **Bar chart of unique characters per House** (Plotly, color-coded by house)
+- **Bar chart of characters per Culture** (top cultures by count)
+- **Lifespan Timeline:** Interactive visualization of character lifespans (birth–death)
+- **Detailed Character Explorer:** Filter by house, pick a character, see biography, lifespan, book, wiki link
+- **Interactive Network Graph:** Visualize character relationships, filter by house/book/relationship type, legend for house colors
+- **Dune-inspired color palette and banner**
 
 ---
 
