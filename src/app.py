@@ -84,29 +84,29 @@ st.plotly_chart(fig_culture, use_container_width=True)
 
 st.markdown("---")
 
-# --- Character Detail Viewer ---
-st.subheader("Character Explorer")
-# Optional: allow user to filter by House/Culture as well
-houses = ['All'] + sorted(df['House_Allegiance'].dropna().unique())
-selected_house = st.selectbox("Select House", houses)
-if selected_house != 'All':
-    char_df = filtered_df[filtered_df['House_Allegiance'] == selected_house]
-else:
-    char_df = filtered_df
+# # --- Character Detail Viewer ---
+# st.subheader("Character Explorer")
+# # Optional: allow user to filter by House/Culture as well
+# houses = ['All'] + sorted(df['House_Allegiance'].dropna().unique())
+# selected_house = st.selectbox("Select House", houses)
+# if selected_house != 'All':
+#     char_df = filtered_df[filtered_df['House_Allegiance'] == selected_house]
+# else:
+#     char_df = filtered_df
 
-names = sorted(char_df['Character'].dropna().unique())
-selected_char = st.selectbox("Select Character", names)
-char_info = char_df[char_df['Character'] == selected_char].iloc[0]
+# names = sorted(char_df['Character'].dropna().unique())
+# selected_char = st.selectbox("Select Character", names)
+# char_info = char_df[char_df['Character'] == selected_char].iloc[0]
 
-with st.expander(f"Details for {selected_char}", expanded=True):
-    st.markdown(f"**House:** {char_info['House_Allegiance']}")
-    st.markdown(f"**Culture:** {char_info['Culture']}")
-    st.markdown(f"**Book:** {char_info['Book']}")
-    st.markdown(f"**Born:** {char_info['Born']}")
-    st.markdown(f"**Died:** {char_info['Died']}")
-    st.markdown(f"**Description:** {char_info['Detail']}")
-    st.markdown(f"[Wiki link]({char_info['URL']})" if pd.notnull(char_info['URL']) else "")
+# with st.expander(f"Details for {selected_char}", expanded=True):
+#     st.markdown(f"**House:** {char_info['House_Allegiance']}")
+#     st.markdown(f"**Culture:** {char_info['Culture']}")
+#     st.markdown(f"**Book:** {char_info['Book']}")
+#     st.markdown(f"**Born:** {char_info['Born']}")
+#     st.markdown(f"**Died:** {char_info['Died']}")
+#     st.markdown(f"**Description:** {char_info['Detail']}")
+#     st.markdown(f"[Wiki link]({char_info['URL']})" if pd.notnull(char_info['URL']) else "")
 
-# --- Ready for future features ---
-# To add: Relationship network, timelines, more filters...
+# # --- Ready for future features ---
+# # To add: Relationship network, timelines, more filters...
 
