@@ -205,16 +205,20 @@ fig.update_traces(
         "Book: %{customdata[4]}<extra></extra>"
     )
 )
-events_df = pd.read_csv(os.path.join('data', 'dune_timeline_events.csv'))
+
+events_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'dune_timeline_events.csv')
+events_df = pd.read_csv(events_path)
+
 
 for _, row in events_df.iterrows():
     fig.add_vline(
         x=row["Year"],
         line_width=2,
         line_dash="dot",
-        line_color="red",
+        line_color="grey",
         annotation_text=row["Event"],
         annotation_position="top right",
+        annotation_textangle=-45,    # This rotates the label!
         opacity=0.7
     )
 
