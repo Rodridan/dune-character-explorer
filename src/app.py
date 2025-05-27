@@ -38,7 +38,7 @@ def load_data():
     print("Loading data...")
     data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'duneCharacters_kaggle.csv')
     if not os.path.exists(data_path):
-        st.warning("Please download `duneCharacters_kaggle.csv` from Kaggle and place it in the `data/` folder.")
+        st.warning("Please download `duneCharacters_kaggle.csv` from Kaggle (https://www.kaggle.com/datasets/bac3917/frank-herberts-dune-characters) and place it in the `data/` folder.")
         st.stop()
     df = pd.read_csv(data_path, encoding="latin1")
     return df
