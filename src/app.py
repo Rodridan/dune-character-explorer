@@ -22,7 +22,6 @@ st.write(
 #     df = pd.read_csv(data_path)
 #     return df
 
-# df = load_data()
 
 @st.cache_data
 def load_data():
@@ -32,6 +31,8 @@ def load_data():
     df = pd.read_csv(data_path)
     st.write("File loaded!")
     return df
+
+df = load_data()
 
 
 # --- Summary Stats ---
