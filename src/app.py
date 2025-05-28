@@ -186,13 +186,14 @@ timeline_df['House_Color'] = timeline_df['House_Allegiance'].map(DUNE_HOUSE_COLO
 fig = px.bar(
     timeline_df,
     y='Character',
-    x='Years AG (after Space Guild)',
+    x='Lifespan',  
     base='Born',
     color='House_Allegiance',
     orientation='h',
     color_discrete_map=DUNE_HOUSE_COLORS,
     title="Dune Character Lifespans",
-    custom_data=['Born', 'Died', 'Lifespan', 'House_Allegiance', 'Book']
+    custom_data=['Born', 'Died', 'Lifespan', 'House_Allegiance', 'Book'],
+    labels={'Lifespan': 'Years AG (after Space Guild)'}  # This sets the axis label!
 )
 
 fig.update_traces(
@@ -221,6 +222,10 @@ for _, row in events_df.iterrows():
         annotation_textangle=-45,    # This rotates the label!
         opacity=0.7
     )
+fig.update_layout(
+    xaxis_title="Years AG (after Space Guild)",
+    yaxis=dict(autorange='reversed')
+)
 
 st.plotly_chart(fig, use_container_width=True)
 
