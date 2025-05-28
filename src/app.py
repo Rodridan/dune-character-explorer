@@ -31,6 +31,7 @@ image_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'dune_banne
 
 st.title("🪐 Dune Character Explorer")
 st.markdown("> Visualize the universe of Frank Herbert’s Dune — characters, houses, relationships, and more.")
+st.markdown("Credits & Acknowledgements:\n- Constructor Academy, for the Data Science Bootcamp and learning support.\n- Frank Herbert for the Dune universe.\n- [Kaggle user bac3917](https://www.kaggle.com/bac3917) for the Dune Characters dataset.\n- [Streamlit](https://streamlit.io/) and [Plotly](https://plotly.com/python/) for great open source tools.")
 st.image(image_path ,  use_container_width=True)
 
 
