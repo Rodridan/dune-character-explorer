@@ -2,6 +2,8 @@
 
 **Dune Character Explorer** is an interactive web app built with Streamlit that allows you to explore, filter, and visualize characters from Frank Herbert's Dune universe. With this app, you can analyze the distribution of characters by house, book, or culture, view character details, and (soon) explore their relationships and story timelines.
 
+https://dune-character-explorer.streamlit.app/
+
 ---
 
 ## 📚 About This Project
